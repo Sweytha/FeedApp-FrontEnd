@@ -289,3 +289,72 @@ export const addFeedMetaDataApi = async (token, feedId, isLike, comment) => {
         return response;
     }
 };
+
+//http://localhost:8080/user/{pageNum}/{pageSize} integrate with this API in the backend
+export const getMyFeedsApi = async (token, pageNumber) => {
+    let response = frameResponse();
+
+    try {
+        const url = `${API_BASE_URL}/feeds/user/${pageNumber}/5`;
+        const apiResponse = await axios.get(url, {
+            headers: { Authorization: frameToken(token) },
+        });
+        if (apiResponse.status === 200) {
+            response = frameResponse(1, apiResponse.data);
+        }
+    } catch (err) {
+        if (err.response) {
+            response = frameResponse(0, err.response.data.message);
+        }
+        console.log(err);
+    } finally {
+        return response;
+    }
+
+};
+
+//http://localhost:8080/user/update integrate with this API in the backend to update user details
+//pass the token from cookies
+export const updateBasicProfileApi = async (
+    token,
+    password,
+    emailId,
+    firstName,
+    lastName,
+    phone
+) => {
+    let response = frameResponse();
+
+    try {
+        //get the url from the backend and store it inside url variable
+        const url = `${API_BASE_URL}/user/update`;
+        //axios.post and pass request body and token in the header 
+        const apiResponse = await axios.post(
+            url,
+            {
+                password,
+                emailId,
+                firstName,
+                lastName,
+                phone,
+            },
+            { headers: { Authorization: frameToken(token) } }
+        );
+        //if the response is 200 Ok, we set the status code to 1 and apiResponse.data to the payLoad
+        if (apiResponse.status === 200) {
+            response = frameResponse(1, apiResponse.data);
+        }
+    } catch (err) {
+        if (err.response) {
+            //if there is an error, we catch the error and set the response code to 0 and payload to error response message
+            response = frameResponse(0, err.response.data.message);
+        }
+        //display the error in the console log
+        console.log(err);
+    } finally {
+        //return the response no matter it's 200 Ok or it is an error response code 
+        return response;
+    }
+
+};
+
